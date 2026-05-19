@@ -112,22 +112,43 @@ def load_data(cfg: dict[str, Any]) -> tuple[gpd.GeoDataFrame, list[float]]:
 # Map rendering
 # ---------------------------------------------------------------------------
 
+def _resolve_source(style: str, token: str | None) -> Any:
+    if not style.startswith("Mapbox.") and "." in style:
+        provider: Any = ctx.providers
+        for part in style.split("."):
+            try:
+                provider = provider[part]
+            except KeyError:
+                raise ValueError(
+                    f"Unknown tile provider: '{style}'. "
+                    f"Check available providers with: python -c \"import contextily as ctx; print(list(ctx.providers.keys()))\""
+                )
+        return provider
+
+    style_id = style[len("Mapbox."):] if style.startswith("Mapbox.") else style
+    if not token:
+        raise ValueError(
+            f"Mapbox style '{style}' requires a MAPBOX_TOKEN.\n"
+            "  Set it in your environment, a .env file, or pass --token.\n"
+            "  Or use a free style like 'OpenStreetMap.Mapnik' (no token needed)."
+        )
+    from xyzservices import TileProvider
+    return TileProvider({**ctx.providers.MapBox, "id": f"mapbox/{style_id}", "accessToken": token})
+
+
 def render_map(
     gdf: gpd.GeoDataFrame,
     map_bounds: list[float],
     cfg: dict[str, Any],
-    mapbox_token: str,
+    token: str | None = None,
 ) -> plt.Figure:
     """Render a point map and return the matplotlib Figure.
 
     If ``cfg['output']`` is set the figure is also saved as a PNG relative
     to ``cfg['_base']``.
     """
-    style = cfg.get("mapbox_style", "outdoors-v12")
-    source = (
-        f"https://api.mapbox.com/styles/v1/mapbox/{style}"
-        f"/tiles/256/{{z}}/{{x}}/{{y}}@2x?access_token={mapbox_token}"
-    )
+    style = cfg.get("style", "OpenStreetMap.Mapnik")
+    source = _resolve_source(style, token)
 
     label_col = cfg.get("label_col")
     color_col = cfg.get("color_col")

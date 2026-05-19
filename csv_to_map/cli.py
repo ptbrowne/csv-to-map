@@ -40,25 +40,37 @@ def _cmd_render(args: argparse.Namespace) -> None:
 
     load_env()
 
-    token = args.token or os.environ.get("MAPBOX_TOKEN", "")
-    if not token:
-        _die(
-            "No Mapbox access token found.",
-            "Set MAPBOX_TOKEN in your environment or in a .env file next to the config,\n"
-            "  or pass it directly with --token pk.eyJ1...\n"
-            "  Get a free token at https://account.mapbox.com",
-        )
+    token = args.token or os.environ.get("MAPBOX_TOKEN") or None
 
-    try:
-        cfg = load_config(args.config)
-    except FileNotFoundError:
-        _die(
-            f"Config file not found: '{args.config}'",
-            "Check the path and try again.",
-        )
-    except ValueError as e:
-        _die(str(e))
+    input_path = Path(args.input).resolve()
 
+    if input_path.suffix.lower() == ".csv":
+        if not input_path.exists():
+            _die(
+                f"CSV file not found: '{input_path}'",
+                "Check the path and try again.",
+            )
+        cfg: dict = {
+            "_base": str(input_path.parent),
+            "csv": input_path.name,
+            "output": input_path.stem + ".png",
+        }
+    else:
+        try:
+            cfg = load_config(input_path)
+        except FileNotFoundError:
+            _die(
+                f"Config file not found: '{input_path}'",
+                "Check the path and try again.",
+            )
+        except ValueError as e:
+            _die(str(e))
+        _info(f"Config:  {input_path}")
+
+    if args.style:
+        cfg["mapbox_style"] = args.style
+    if args.bbox:
+        cfg["bbox"] = str(Path(args.bbox).resolve())
     if args.output:
         cfg["output"] = args.output
 
@@ -69,8 +81,6 @@ def _cmd_render(args: argparse.Namespace) -> None:
             "  or pass --output map.png on the command line.",
         )
 
-    _info(f"Config:  {Path(args.config).resolve()}")
-
     base = Path(cfg["_base"])
     csv_path = base / cfg["csv"]
     if not csv_path.exists():
@@ -80,7 +90,8 @@ def _cmd_render(args: argparse.Namespace) -> None:
             f"  Current value: \"{cfg['csv']}\"",
         )
 
-    bbox_path = base / cfg.get("bbox", "bbox.json")
+    bbox_key = cfg.get("bbox", "bbox.json")
+    bbox_path = Path(bbox_key) if Path(bbox_key).is_absolute() else base / bbox_key
     if not bbox_path.exists():
         _warn(
             f"Bounding box file not found: '{bbox_path}'\n"
@@ -128,12 +139,15 @@ def _cmd_init(args: argparse.Namespace) -> None:
             continue
         (dest / item.name).write_bytes(item.read_bytes())
 
+    csv_rel = dest.relative_to(Path.cwd()) / "sites.csv"
     print(f"\n  ✔  Example copied to {dest.resolve()}/\n")
     _info("Next steps:")
     _info(f"  1. Set your Mapbox token: export MAPBOX_TOKEN=pk.eyJ1...")
     _info(f"  2. Render the example map:")
-    _info(f"       csv-to-map render {dest.relative_to(Path.cwd())}/config.json")
-    _info(f"  3. Edit config.json and sites.csv to use your own data.\n")
+    _info(f"       csv-to-map render {csv_rel}")
+    _info(f"  3. Try a different style:")
+    _info(f"       csv-to-map render {csv_rel} --style satellite-streets-v12")
+    _info(f"  4. Replace sites.csv with your own data.\n")
 
 
 def _cmd_schema(args: argparse.Namespace) -> None:
@@ -171,16 +185,30 @@ def main() -> None:
     # -- render ---------------------------------------------------------------
     render_p = sub.add_parser(
         "render",
-        help="Render a map from a config file.",
+        help="Render a map from a CSV file or a config file.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 examples:
+  csv-to-map render sites.csv
+  csv-to-map render sites.csv --style satellite-streets-v12
+  csv-to-map render sites.csv --bbox my-area.json
   csv-to-map render config.json
-  csv-to-map render config.json --output map.png
-  csv-to-map render config.json --token pk.eyJ1...
         """,
     )
-    render_p.add_argument("config", help="Path to the JSON config file.")
+    render_p.add_argument(
+        "input",
+        help="Path to a CSV file or a JSON config file.",
+    )
+    render_p.add_argument(
+        "--style",
+        metavar="STYLE",
+        help="Mapbox style ID (e.g. satellite-streets-v12, streets-v12). Overrides the config.",
+    )
+    render_p.add_argument(
+        "--bbox",
+        metavar="FILE",
+        help="Path to a GeoJSON bounding-box file. Overrides the config.",
+    )
     render_p.add_argument(
         "--token",
         metavar="TOKEN",

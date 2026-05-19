@@ -48,10 +48,38 @@
       "type": "string",
       "description": "Map title shown above the figure"
     },
-    "mapbox_style": {
+    "style": {
       "type": "string",
-      "default": "outdoors-v12",
-      "description": "Mapbox style ID, e.g. outdoors-v12, streets-v12, satellite-streets-v12"
+      "default": "OpenStreetMap.Mapnik",
+      "description": "Tile provider in dot notation. Any contextily provider works. Mapbox styles use Mapbox.<style-id> and require MAPBOX_TOKEN.",
+      "examples": [
+        "OpenStreetMap.Mapnik",
+        "OpenStreetMap.HOT",
+        "CartoDB.Positron",
+        "CartoDB.DarkMatter",
+        "CartoDB.Voyager",
+        "Esri.WorldImagery",
+        "Esri.WorldStreetMap",
+        "Esri.WorldTopoMap",
+        "Esri.WorldShadedRelief",
+        "Esri.NatGeoWorldMap",
+        "Stadia.AlidadeSmooth",
+        "Stadia.AlidadeSmoothDark",
+        "Stadia.AlidadeSatellite",
+        "Stadia.OSMBright",
+        "Stadia.Outdoors",
+        "Stadia.StamenTerrain",
+        "Stadia.StamenToner",
+        "Stadia.StamenWatercolor",
+        "OpenTopoMap",
+        "CyclOSM",
+        "Mapbox.streets-v12",
+        "Mapbox.outdoors-v12",
+        "Mapbox.light-v11",
+        "Mapbox.dark-v11",
+        "Mapbox.satellite-v9",
+        "Mapbox.satellite-streets-v12"
+      ]
     },
     "output": {
       "type": "string",
