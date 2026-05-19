@@ -137,7 +137,13 @@ def _cmd_init(args: argparse.Namespace) -> None:
     for item in example_pkg.iterdir():
         if item.name.endswith(".png"):
             continue
-        (dest / item.name).write_bytes(item.read_bytes())
+        data = item.read_bytes()
+        if item.name == "config.json":
+            data = data.replace(b'"../config.schema.json"', b'"./config.schema.json"')
+        (dest / item.name).write_bytes(data)
+
+    schema_text = files("csv_to_map").joinpath("config.schema.json").read_bytes()
+    (dest / "config.schema.json").write_bytes(schema_text)
 
     csv_rel = dest.relative_to(Path.cwd()) / "sites.csv"
     print(f"\n  ✔  Example copied to {dest.resolve()}/\n")
