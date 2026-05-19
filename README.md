@@ -7,7 +7,7 @@ Render georeferenced point maps from a CSV file. Supports Mapbox basemaps, per-c
 Requires [uv](https://docs.astral.sh/uv/).
 
 ```bash
-uv add git+https://github.com/your-org/csv-to-map.git
+uv add git+https://github.com/ptbrowne/csv-to-map.git
 ```
 
 This installs the `csv-to-map` command.
