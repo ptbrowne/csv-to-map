@@ -1,0 +1,16 @@
+{
+  "$schema": "../config.schema.json",
+  "csv": "sites.csv",
+  "bbox": "bbox.json",
+  "label_col": "name",
+  "color_col": "vegetation",
+  "color_map": {
+    "grassland": "#4caf7d",
+    "heathland": "#e67e22",
+    "lava field": "#7f8c8d",
+    "__default__": "#e74c3c"
+  },
+  "title": "Iceland — example sites",
+  "mapbox_style": "outdoors-v12",
+  "output": "output.png"
+}

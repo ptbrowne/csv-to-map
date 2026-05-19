@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MapConfig",
+  "description": "Configuration for the points-map marimo notebook",
+  "type": "object",
+  "required": ["csv"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "csv": {
+      "type": "string",
+      "description": "Path to the CSV file (relative to this config file)"
+    },
+    "bbox": {
+      "type": "string",
+      "description": "Path to a GeoJSON file defining the map bounding box. Defaults to bbox.json next to the CSV. If absent the data extent is used."
+    },
+    "lat_col": {
+      "type": "string",
+      "default": "Latitude",
+      "description": "Name of the latitude column in the CSV"
+    },
+    "lon_col": {
+      "type": "string",
+      "default": "Longitude",
+      "description": "Name of the longitude column in the CSV"
+    },
+    "label_col": {
+      "type": "string",
+      "description": "Column whose values are used as point labels. Omit to use sequential numeric indices (1, 2, 3 …)."
+    },
+    "color_col": {
+      "type": "string",
+      "description": "Column whose values drive point colour. Requires color_map."
+    },
+    "color_map": {
+      "type": "object",
+      "description": "Maps color_col values to hex colours. Use '__default__' as a fallback for unmatched values.",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^#[0-9a-fA-F]{6}$"
+      },
+      "examples": [
+        { "grassland": "#2ecc71", "__default__": "#e74c3c" }
+      ]
+    },
+    "title": {
+      "type": "string",
+      "description": "Map title shown above the figure"
+    },
+    "mapbox_style": {
+      "type": "string",
+      "default": "outdoors-v12",
+      "description": "Mapbox style ID, e.g. outdoors-v12, streets-v12, satellite-streets-v12"
+    },
+    "output": {
+      "type": "string",
+      "description": "Output PNG filename (relative to this config file). Omit to skip saving."
+    }
+  }
+}
