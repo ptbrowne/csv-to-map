@@ -68,7 +68,7 @@ def _cmd_render(args: argparse.Namespace) -> None:
         _info(f"Config:  {input_path}")
 
     if args.style:
-        cfg["mapbox_style"] = args.style
+        cfg["style"] = args.style
     if args.bbox:
         cfg["bbox"] = str(Path(args.bbox).resolve())
     if args.output:

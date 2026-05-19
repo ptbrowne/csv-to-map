@@ -11,6 +11,6 @@
     "__default__": "#e74c3c"
   },
   "title": "Iceland — example sites",
-  "style": "Mapbox.outdoors-v12",
+  "style": "OpenTopoMap",
   "output": "output.png"
 }
