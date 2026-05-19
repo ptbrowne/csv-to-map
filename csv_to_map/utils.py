@@ -125,6 +125,9 @@ def _resolve_source(style: str, token: str | None) -> Any:
                 )
         return provider
 
+    if not style.startswith("Mapbox.") and style in ctx.providers:
+        return ctx.providers[style]
+
     style_id = style[len("Mapbox."):] if style.startswith("Mapbox.") else style
     if not token:
         raise ValueError(
@@ -204,7 +207,7 @@ def render_map(
     ax.set_xlim(map_bounds[0], map_bounds[2])
     ax.set_ylim(map_bounds[1], map_bounds[3])
     try:
-        ctx.add_basemap(ax, source=source, zoom="auto")
+        ctx.add_basemap(ax, source=source, zoom="auto", zoom_adjust=1)
     except Exception as e:
         ax.set_facecolor("#cce0f0")
         ax.text(
@@ -261,6 +264,6 @@ def render_map(
 
     if cfg.get("output"):
         out = Path(cfg["_base"]) / cfg["output"]
-        fig.savefig(out, dpi=200, bbox_inches="tight")
+        fig.savefig(out, dpi=300, bbox_inches="tight")
 
     return fig
