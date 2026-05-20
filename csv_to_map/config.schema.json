@@ -81,6 +81,16 @@
         "Mapbox.satellite-streets-v12"
       ]
     },
+    "font_size": {
+      "type": "number",
+      "default": 8.5,
+      "description": "Font size for point labels."
+    },
+    "circle_size": {
+      "type": "number",
+      "default": 6,
+      "description": "Marker size for the circle drawn at each point."
+    },
     "output": {
       "type": "string",
       "description": "Output PNG filename (relative to this config file). Omit to skip saving."

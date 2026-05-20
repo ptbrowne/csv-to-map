@@ -153,6 +153,9 @@ def render_map(
     style = cfg.get("style", "OpenStreetMap.Mapnik")
     source = _resolve_source(style, token)
 
+    font_size = cfg.get("font_size", 8.5)
+    circle_size = cfg.get("circle_size", 6)
+
     label_col = cfg.get("label_col")
     color_col = cfg.get("color_col")
     color_map = cfg.get("color_map", {})
@@ -183,7 +186,7 @@ def render_map(
             row.geometry.x, row.geometry.y,
             "o",
             color=_color(row),
-            markersize=6,
+            markersize=circle_size,
             alpha=0.92,
             markeredgecolor="white",
             markeredgewidth=1.2,
@@ -195,7 +198,7 @@ def render_map(
         t = ax.text(
             row.geometry.x, row.geometry.y,
             _label(row, idx),
-            fontsize=8.5,
+            fontsize=font_size,
             color="#1a1a1a",
             fontfamily=_FONT,
             fontweight=500,
